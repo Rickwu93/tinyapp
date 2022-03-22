@@ -65,12 +65,22 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);         // redirects shortURL
 });
 
+//updates longURL
+app.post('/urls/:shortURL', (req, res) => {
+  //console.log(req.params)
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.newURL
+  res.redirect("/urls");
+});
+
 //deletes URL and redirects client back to /urls
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
-  res.redirect(`/urls`) //redirect to refreshed page of deleted url
+  res.redirect("/urls") //redirect to refreshed page of deleted url
 })
+
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
