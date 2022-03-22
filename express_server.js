@@ -17,6 +17,7 @@ return randomString
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+//set the view engine to ejs
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -61,10 +62,15 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   //console.log(longURL, shortURL);  // Log the POST request body to the console
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
-
-  
+  res.redirect(`/urls/${shortURL}`);         // redirects shortURL
 });
+
+//deletes URL and redirects client back to /urls
+app.post('/urls/:shortURL/delete', (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect(`/urls`) //redirect to refreshed page of deleted url
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
