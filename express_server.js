@@ -75,7 +75,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
 });
-
+//POST - deletes out url stored
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
@@ -91,7 +91,7 @@ app.get("/urls/:shortURL/edit", (req, res) => {
 app.post("/urls/:shortURL/edit", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL; //urlDatabase[shorturl] = lo // shortURL is the key and the longURL is the value 
+  urlDatabase[shortURL] = longURL; //this changes the url fields to new updated one
   res.redirect("/urls");
 });
 
