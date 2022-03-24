@@ -87,6 +87,15 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL, templateVars)
 });
 
+//GET - render into login page
+app.get("/login", (req, res) => {
+  const user = users[req.cookies["user_id"]]
+  const templateVars = {
+    user
+  };
+  res.render("login_page", templateVars)
+});
+
 app.post('/urls/:shortURL', (req, res) => {
   //console.log(req.params)
   const shortURL = req.params.shortURL;
