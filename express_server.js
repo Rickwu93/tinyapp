@@ -13,12 +13,13 @@ function generateRandomString() { // generates random string
 };
 
 //check existing emails are duplicates
-const duplicateUser = function(email) {
+const findDuplicateEmails = function (email, users) {
   for (const user in users) {
     if (users[user].email === email) {
-      return true;
+      return users[user];
     }
-  } return false;
+  }
+  return false;
 };
 
 const urlDatabase = {
@@ -139,7 +140,7 @@ app.post('/register', (req, res) => {
     res.send(400, "Please create a valid email and password");
   };
 
-  if (duplicateUser(candidateEmail)) {
+  if (findDuplicateEmails(candidateEmail, users)) {
     res.send(400, "This email is already existing in our database")
   };
 
@@ -162,11 +163,21 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   res.redirect("/urls");
 });
 
-//POST - login and then redirect user back to /url
-app.post("/login", (req, res) => {
-  const id = req.body["user_id"];
-  res.cookie("user_id", id);
-  res.redirect("/urls");
+//POST - login and then redirect user back new endpoint email/password fields
+app.post('/login', (req, res) => {
+  const user = findDuplicateEmails(req.body.email, users);
+  if (user) {
+    if (req.body.password === user.password) {
+      res.cookie('user_id', user.id);
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 403;
+      res.send('403 Status Code. You entered the wrong password.')
+    }
+  } else {
+    res.statusCode = 403;
+    res.send('403 Status Code. This email address is not registered.')
+  }
 });
 //POST - logout and clears cookies then redirect user back to /url
 app.post("/logout", (req, res) => {
