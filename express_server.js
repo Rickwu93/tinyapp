@@ -23,8 +23,8 @@ const findDuplicateEmails = function (email, users) {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
+  "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID"},
 };
 
 const users = { //user object
@@ -62,30 +62,35 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => { //get the response for urls/new and I want to render what I have on urls_new
+  //user cannot access page to create url, cannot access and redirects
   const user = users[req.cookies["user_id"]]
   const templateVars = {
     user
   };
+   if (!user) {
+     res.redirect("/login")
+   } else {
   res.render("urls_new", templateVars);
+   }
 });
-
+//since const URL changed we need to change the object structure for all
 app.get("/urls/:shortURL", (req, res) => { //when given a shortURL 
   const user = users[req.cookies["user_id"]]
   const templateVars = {
     shortURL: req.params.shortURL, // when you do the get req. the req is the object of the url. params is one of the keys and :shortURL is the value of that key
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user
   };   
   res.render("urls_show", templateVars); 
 }); 
-        
+        //when users create new undefined URL
 app.get("/u/:shortURL", (req, res) => { 
- const longURL = urlDatabase[req.params.shortURL]
- const user = users[req.cookies["user_id"]]
- const templateVars = {
-   user
- };
-  res.redirect(longURL, templateVars)
+ const longURL = urlDatabase[req.params.shortURL].longURL;
+ if (longURL === undefined) {
+  res.send(302);
+} else {
+  res.redirect(longURL);
+}
 });
 
 //GET - render into login page
@@ -105,9 +110,12 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 //POST - creates new url to database and redirects to short url page
 app.post("/urls", (req, res) => { 
-  const longURL = req.body.longURL
-  const shortURL = generateRandomString()
-  urlDatabase[shortURL] = longURL;
+  //const longURL = req.body.longURL
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {       //value for longURL changed
+    longURL: req.body.longURL,
+    userID: req.cookies["user_id"],
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 //POST - deletes out url stored
