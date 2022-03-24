@@ -24,7 +24,7 @@
       <tbody> 
         <% for(let url in urls) { %>
           <tr>
-            <td><%= url[url] %></td>  
+            <td><%= url %></td>  
             <td><%= urls[url].longURL %></td> 
             <td>
               <form method="get" action="/urls/<%= url %>/edit"> <!-- method and action sends information to the server -->

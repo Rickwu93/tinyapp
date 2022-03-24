@@ -22,6 +22,7 @@ const findDuplicateEmails = function (email, users) {
   return false;
 };
 
+
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
   "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID"},
@@ -63,11 +64,11 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => { //get the response for urls/new and I want to render what I have on urls_new
   //user cannot access page to create url, cannot access and redirects
-  const user = users[req.cookies["user_id"]]
+  const user = users[req.cookies["user_id"]];
   const templateVars = {
     user
   };
-   if (!user) {
+   if (!templateVars.user) {
      res.redirect("/login")
    } else {
   res.render("urls_new", templateVars);
