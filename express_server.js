@@ -22,6 +22,15 @@ const findDuplicateEmails = function (email, users) {
   return false;
 };
 
+const urlsForUser = function (id) {
+  let userURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (id === urlDatabase[shortURL].userID) {
+      userURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userURLs;
+}
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
@@ -54,17 +63,20 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => { 
-  const user = users[req.cookies["user_id"]]
   const templateVars = { 
-    user,
-    urls: urlDatabase
+    urls: urlsForUser(req.cookies["user_id"]),
+    user: users[req.cookies["user_id"]],
   };
+  //console.log('templateVars:', templateVars)
   res.render("urls_index", templateVars) //render using urls_index for the value of templateVars
 });
 
 app.get("/urls/new", (req, res) => { //get the response for urls/new and I want to render what I have on urls_new
   //user cannot access page to create url, cannot access and redirects
   const user = users[req.cookies["user_id"]];
+  if(!users) {
+    return res.redirect("/login")
+  }
   const templateVars = {
     user
   };
@@ -76,11 +88,11 @@ app.get("/urls/new", (req, res) => { //get the response for urls/new and I want 
 });
 //since const URL changed we need to change the object structure for all
 app.get("/urls/:shortURL", (req, res) => { //when given a shortURL 
-  const user = users[req.cookies["user_id"]]
   const templateVars = {
     shortURL: req.params.shortURL, // when you do the get req. the req is the object of the url. params is one of the keys and :shortURL is the value of that key
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user
+    urlUserID: urlDatabase[req.params.shortURL].userID,
+    user: users[req.cookies["user_id"]],
   };   
   res.render("urls_show", templateVars); 
 }); 
@@ -121,13 +133,25 @@ app.post("/urls", (req, res) => {
 });
 //POST - deletes out url stored
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const user = users[req.cookies["user_id"]]
+
+  if(!users) {
+    return res.send("Please log in")
+  }
+  
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
 });
 
 app.get("/urls/:shortURL/edit", (req, res) => {
+  
+  if(!users) {
+    return res.send("Please log in")
+  }
+  
   const user = users[req.cookies["user_id"]]
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user}
+  //console.log(urlDatabase[req.params.shortURL])
+  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user}
   res.render("urls_show", templateVars); //render builds a page 
 });
 
@@ -166,6 +190,9 @@ app.post('/register', (req, res) => {
 
 //POST - updates long url
 app.post("/urls/:shortURL/edit", (req, res) => {
+  if(!users) {
+    return res.send("Please log in")
+  }
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL; //this changes the url fields to new updated one
@@ -181,7 +208,7 @@ app.post('/login', (req, res) => {
       res.redirect('/urls');
     } else {
       res.statusCode = 403;
-      res.send('403 Status Code. You entered the wrong password.')
+      res.send('403 Status Code. Invalid credentials.')
     }
   } else {
     res.statusCode = 403;
@@ -200,6 +227,3 @@ app.listen(PORT, () => { //telling server to listen to this port
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-//req.params = an object that holds all the parameters from the URL 
-// <%= id %> is a dynamic tag that brings in the variable 
-//res.render('____') brings and connects the ejs file with the server file 
