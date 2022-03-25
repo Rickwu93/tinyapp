@@ -4,7 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["URL fields and"](https://github.com/Rickwu93/tinyapp/blob/master/docs/urls-page1.png?raw=true)
+!["User Login Fields"](https://github.com/Rickwu93/tinyapp/blob/master/docs/urls-page4.png?raw=true)
 !["A random shortURL is generated from the LongURL that redirects to the website"](https://github.com/Rickwu93/tinyapp/blob/master/docs/urls-page3.png..png?raw=true)
 !["Allows user to store their long URLs and short URLs"](https://github.com/Rickwu93/tinyapp/blob/master/docs/urls-page2.png..png?raw=true)
 
